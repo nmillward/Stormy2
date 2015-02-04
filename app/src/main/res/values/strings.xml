@@ -9,4 +9,6 @@
     <string name="OK">Ok</string>
     <string name="network_unavailable">Network is unavailable!</string>
 
+    <string name="google_maps_key">AIzaSyAIRtyebweI483eB_9AMiLO6Wf69t9ek40</string>
+
 </resources>
