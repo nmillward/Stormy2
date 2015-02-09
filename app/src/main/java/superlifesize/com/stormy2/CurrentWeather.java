@@ -118,4 +118,5 @@ public class CurrentWeather {
     public void setSummary(String summary) {
         mSummary = summary;
     }
+
 }

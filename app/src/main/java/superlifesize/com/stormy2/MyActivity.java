@@ -3,6 +3,9 @@ package superlifesize.com.stormy2;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -23,16 +26,22 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 
-public class MyActivity extends Activity {
+public class MyActivity extends Activity implements LocationProvider.LocationCallback {
 
     public static final String TAG = MyActivity.class.getSimpleName();
 
     private CurrentWeather mCurrentWeather;
+    private LocationProvider mLocationProvider;
+
+    private double latitude = 0.0;
+    private double longitude = 0.0;
 
     @InjectView(R.id.temperatureLabel) TextView mTemperatureLabel;
     @InjectView(R.id.tv_timeLabel) TextView mTimeLabel;
@@ -44,6 +53,7 @@ public class MyActivity extends Activity {
     @InjectView(R.id.ic_location) ImageView mIconLocation;
     @InjectView(R.id.iv_refresh) ImageView mRefreshImageView;
     @InjectView(R.id.progressBar) ProgressBar mProgressBar;
+    @InjectView(R.id.tv_locationLabel) TextView mLocationTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +63,9 @@ public class MyActivity extends Activity {
 
         mProgressBar.setVisibility(View.INVISIBLE);
 
-        final double latitude = 37.8267;
-        final double longitude = -122.423;
+        mLocationProvider = new LocationProvider(this, this);
+
+        Log.d(TAG, "ON CREATE: " + latitude + ", " + longitude);
 
         mRefreshImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,10 +74,24 @@ public class MyActivity extends Activity {
             }
         });
 
-        getForecast(latitude, longitude);
-
         Log.d(TAG, "Running on the Main Thread");
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Log.d(TAG, "ON RESUME");
+        mLocationProvider.Connect();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        mLocationProvider.Disconnect();
+    }
+
 
     private void getForecast(double latitude, double longitude) {
         String apiKey = "78a898a4e77432239aa213d337238bed";
@@ -109,6 +134,7 @@ public class MyActivity extends Activity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    Log.d(TAG, "UPDATE DISPLAY DATA HERE");
                                     updateDisplay();
                                 }
                             });
@@ -145,6 +171,7 @@ public class MyActivity extends Activity {
         mHumidityValue.setText(mCurrentWeather.getHumidity() + "");
         mPrecipValue.setText(mCurrentWeather.getPrecipChance() + "%");
         mSummaryLabel.setText(mCurrentWeather.getSummary());
+//        mLocationTitle.setText(mCurrentWeather.getLocationTitle());
 
         Drawable drawable = getResources().getDrawable(mCurrentWeather.getIconId());
         mIconLocation.setImageDrawable(drawable);
@@ -171,6 +198,23 @@ public class MyActivity extends Activity {
         return currentWeather;
     }
 
+    private void getGeolocation() {
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        List<Address> addressList = null;
+        Address address = null;
+        try {
+            addressList = geocoder.getFromLocation(latitude, longitude, 1);
+            address = addressList.get(0);
+            if (address != null && addressList.size() > 0) {
+                mLocationTitle.setText(address.getLocality() + ", " + address.getCountryCode());
+                Log.d(TAG, address.getLocality() + ", " + address.getCountryCode());
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "Unable to connect to Geocoder", e);
+        }
+
+    }
+
     private boolean isNetworkAvailable() {
         ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
@@ -186,6 +230,26 @@ public class MyActivity extends Activity {
         dialog.show(getFragmentManager(), "error_dialog");
     }
 
+
+    @Override
+    public void handleNewLocation(Location location) {
+        Log.d(TAG, "HANDLE NEW LOCATION: " + location.toString());
+
+        //Get current location coordinates
+
+//        if (location != null) {
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
+
+            Log.i(TAG, "Latitude from GeoLocation: " + latitude);
+            Log.i(TAG, "Longitude from GeoLocation: " + longitude);
+
+            getForecast(latitude, longitude);
+
+            getGeolocation();
+
+//        }
+    }
 
 }
 
