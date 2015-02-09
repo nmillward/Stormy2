@@ -11,10 +11,14 @@ public class CurrentWeather {
     private String mIcon;
     private long mTime;
     private double mTemperature;
+    private double mFeelsLike;
+    private double mTempMin;
+    private double mTempMax;
     private double mHumidity;
     private double mPrecipChance;
     private String mSummary;
     private String mTimeZone;
+
 
     public String getTimeZone() {
         return mTimeZone;
@@ -92,6 +96,30 @@ public class CurrentWeather {
 
     public void setTemperature(double temperature) {
         mTemperature = temperature;
+    }
+
+    public int getFeelsLike() {
+        return (int) Math.round(mFeelsLike);
+    }
+
+    public void setFeelsLike(double feelsLike) {
+        mFeelsLike = feelsLike;
+    }
+
+    public int getTempMin() {
+        return (int) Math.round(mTempMin);
+    }
+
+    public void setTempMin(double tempMin) {
+        mTempMin = tempMin;
+    }
+
+    public int getTempMax() {
+        return (int) Math.round(mTempMax);
+    }
+
+    public void setTempMax(double tempMax) {
+        mTempMax = tempMax;
     }
 
     public double getHumidity() {

@@ -94,7 +94,7 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
 
 
     private void getForecast(double latitude, double longitude) {
-        String apiKey = "78a898a4e77432239aa213d337238bed";
+        String apiKey = getString(R.string.forecast_api_key);
         String forecastUrl = "https://api.forecast.io/forecast/" + apiKey + "/" + latitude + "," + longitude;
 
         if (isNetworkAvailable()) {
@@ -166,32 +166,54 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
     }
 
     private void updateDisplay() {
+        //Update Current Weather
         mTemperatureLabel.setText(mCurrentWeather.getTemperature() + "");
         mTimeLabel.setText("At " + mCurrentWeather.getFormattedTime() + " it will be");
         mHumidityValue.setText(mCurrentWeather.getHumidity() + "");
         mPrecipValue.setText(mCurrentWeather.getPrecipChance() + "%");
         mSummaryLabel.setText(mCurrentWeather.getSummary());
-//        mLocationTitle.setText(mCurrentWeather.getLocationTitle());
 
         Drawable drawable = getResources().getDrawable(mCurrentWeather.getIconId());
         mIconLocation.setImageDrawable(drawable);
+
+        //Update Hourly Weather
+
+
+        //Update Daily Weather
+
     }
 
     private CurrentWeather getCurrentDetails(String jsonData) throws JSONException {
         JSONObject forecast = new JSONObject(jsonData);
-        String timezone = forecast.getString("timezone");
+        String timezone = forecast.getString(WeatherConstants.KEY_ATTR_TIMEZONE);
         Log.i(TAG, "From JSON: " + timezone);
 
-        JSONObject currently = forecast.getJSONObject("currently");
+        //Weather Objects
+        JSONObject currently = forecast.getJSONObject(WeatherConstants.KEY_CURRENT_WEATHER);
+        JSONObject hourly = forecast.getJSONObject(WeatherConstants.KEY_HOURLY_WEATHER);
+        JSONObject daily = forecast.getJSONObject(WeatherConstants.KEY_DAILY_WEATHER);
 
         CurrentWeather currentWeather = new CurrentWeather();
-        currentWeather.setHumidity(currently.getDouble("humidity"));
-        currentWeather.setTime(currently.getLong("time"));
-        currentWeather.setIcon(currently.getString("icon"));
-        currentWeather.setPrecipChance(currently.getDouble("precipProbability"));
-        currentWeather.setSummary(currently.getString("summary"));
-        currentWeather.setTemperature(currently.getDouble("temperature"));
+
+        //Current Weather
+        currentWeather.setHumidity(currently.getDouble(WeatherConstants.KEY_ATTR_HUMIDITY));
+        currentWeather.setTime(currently.getLong(WeatherConstants.KEY_ATTR_TIME));
+        currentWeather.setIcon(currently.getString(WeatherConstants.KEY_ATTR_ICON));
+        currentWeather.setPrecipChance(currently.getDouble(WeatherConstants.KEY_ATTR_PRECIP_PROB));
+        currentWeather.setSummary(currently.getString(WeatherConstants.KEY_ATTR_SUMMARY));
+        currentWeather.setTemperature(currently.getDouble(WeatherConstants.KEY_ATTR_TEMPERATURE));
         currentWeather.setTimeZone(timezone);
+        currentWeather.setFeelsLike(currently.getDouble(WeatherConstants.KEY_ATTR_FEELS_LIKE));
+
+        //Hourly Weather
+//        currentWeather.setTemperature(hourly.getDouble(WeatherConstants.KEY_ATTR_TEMPERATURE));
+//        currentWeather.setIcon(hourly.getString(WeatherConstants.KEY_ATTR_ICON));
+
+        //Daily Weather
+//        currentWeather.setTempMax(daily.getDouble(WeatherConstants.KEY_ATTR_TEMP_MAX));
+//        currentWeather.setTempMin(daily.getDouble(WeatherConstants.KEY_ATTR_TEMP_MIN));
+//        currentWeather.setIcon(daily.getString(WeatherConstants.KEY_ATTR_ICON));
+
 
         Log.d(TAG, currentWeather.getFormattedTime());
 
