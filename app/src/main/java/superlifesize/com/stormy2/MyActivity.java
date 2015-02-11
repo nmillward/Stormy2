@@ -22,6 +22,7 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -190,8 +191,6 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
 
         //Weather Objects
         JSONObject currently = forecast.getJSONObject(WeatherConstants.KEY_CURRENT_WEATHER);
-        JSONObject hourly = forecast.getJSONObject(WeatherConstants.KEY_HOURLY_WEATHER);
-        JSONObject daily = forecast.getJSONObject(WeatherConstants.KEY_DAILY_WEATHER);
 
         CurrentWeather currentWeather = new CurrentWeather();
 
@@ -206,6 +205,18 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
         currentWeather.setFeelsLike(currently.getDouble(WeatherConstants.KEY_ATTR_FEELS_LIKE));
 
         //Hourly Weather
+        //data structure >>>> hourly.data[x].time
+        JSONObject hourly = forecast.getJSONObject(WeatherConstants.KEY_HOURLY_WEATHER);
+
+        JSONArray jsonHourlyData = hourly.getJSONArray(WeatherConstants.KEY_DATA);
+        Log.d(TAG, "Hourly JSON Data: " + jsonHourlyData);
+        for (int i=0; i < jsonHourlyData.length(); i++) {
+            JSONObject hourlyTemp = jsonHourlyData.getJSONObject(i);
+            Log.d(TAG, "hourly array items: " + hourlyTemp + "/n");
+            
+
+        }
+
 //        currentWeather.setTemperature(hourly.getDouble(WeatherConstants.KEY_ATTR_TEMPERATURE));
 //        currentWeather.setIcon(hourly.getString(WeatherConstants.KEY_ATTR_ICON));
 

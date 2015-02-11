@@ -18,6 +18,7 @@ public class CurrentWeather {
     private double mPrecipChance;
     private String mSummary;
     private String mTimeZone;
+//    private String[] DailyData;
 
 
     public String getTimeZone() {

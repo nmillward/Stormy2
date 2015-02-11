@@ -9,6 +9,7 @@ public class WeatherConstants {
     public static final String KEY_CURRENT_WEATHER = "currently";
     public static final String KEY_HOURLY_WEATHER = "hourly";
     public static final String KEY_DAILY_WEATHER = "daily";
+    public static final String KEY_DATA = "data";
 
     //Attributes
     public static final String KEY_ATTR_TIMEZONE = "timezone";
