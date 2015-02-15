@@ -2,7 +2,6 @@ package superlifesize.com.stormy2;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * Created by nmilward on 1/18/15.
@@ -12,13 +11,10 @@ public class CurrentWeather {
     private long mTime;
     private double mTemperature;
     private double mFeelsLike;
-    private double mTempMin;
-    private double mTempMax;
     private double mHumidity;
     private double mPrecipChance;
     private String mSummary;
     private String mTimeZone;
-//    private String[] DailyData;
 
 
     public String getTimeZone() {
@@ -81,7 +77,6 @@ public class CurrentWeather {
 
     public String getFormattedTime() {
         SimpleDateFormat formatter = new SimpleDateFormat("h:mm a");
-        formatter.setTimeZone(TimeZone.getTimeZone(getTimeZone()));
         Date dateTime = new Date(getTime() * 1000);
         String timeString = formatter.format(dateTime);
         return timeString;
@@ -105,22 +100,6 @@ public class CurrentWeather {
 
     public void setFeelsLike(double feelsLike) {
         mFeelsLike = feelsLike;
-    }
-
-    public int getTempMin() {
-        return (int) Math.round(mTempMin);
-    }
-
-    public void setTempMin(double tempMin) {
-        mTempMin = tempMin;
-    }
-
-    public int getTempMax() {
-        return (int) Math.round(mTempMax);
-    }
-
-    public void setTempMax(double tempMax) {
-        mTempMax = tempMax;
     }
 
     public double getHumidity() {

@@ -4,13 +4,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Created by nmilward on 2/8/15.
+ * Created by nmilward on 2/15/15.
  */
-public class HourlyWeather {
+public class DailyWeather {
 
     private String mIcon;
-    private double mTemperature;
-    private long mHourOfDay;
+    private long mDayOfWeek;
+    private double mTempMin;
+    private double mTempMax;
+
 
     public void setIcon(String icon) {
         mIcon = icon;
@@ -54,27 +56,42 @@ public class HourlyWeather {
         return iconId;
     }
 
-    public int getTemperature() {
-        return (int) Math.round(mTemperature);
+
+    //Formatted for Day of the Week (i.e. "Monday")
+    //EEE = Mon
+    //EEEEE = M
+    public long getDayOfWeek() {
+        return mDayOfWeek;
     }
 
-    public void setTemperature(double temperature) {
-        mTemperature = temperature;
+    public String getFormattedDate() {
+        SimpleDateFormat formatter = new SimpleDateFormat("EEEE");
+        Date day = new Date();
+        String dayOfTheWeek = formatter.format(day);
+        return dayOfTheWeek;
     }
 
-    public long getTime() {
-        return mHourOfDay;
+    public void setDayOfWeek(long dayOfWeek) {
+        mDayOfWeek = dayOfWeek;
     }
 
-    public String getFormattedTime() {
-        SimpleDateFormat formatter = new SimpleDateFormat("h a");
-        Date dateTime = new Date(getTime() * 1000);
-        String timeString = formatter.format(dateTime);
-        return timeString;
+
+
+    public int getTempMin() {
+        return (int) Math.round(mTempMin);
     }
 
-    public void setTime(long hourOfDay) {
-        mHourOfDay = hourOfDay;
+    public void setTempMin(double tempMin) {
+        mTempMin = tempMin;
     }
+
+    public int getTempMax() {
+        return (int) Math.round(mTempMax);
+    }
+
+    public void setTempMax(double tempMax) {
+        mTempMax = tempMax;
+    }
+
 
 }

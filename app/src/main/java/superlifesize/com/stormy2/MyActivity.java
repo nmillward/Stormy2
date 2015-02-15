@@ -66,8 +66,6 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
 
         mLocationProvider = new LocationProvider(this, this);
 
-        Log.d(TAG, "ON CREATE: " + latitude + ", " + longitude);
-
         mRefreshImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -204,6 +202,7 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
         currentWeather.setTimeZone(timezone);
         currentWeather.setFeelsLike(currently.getDouble(WeatherConstants.KEY_ATTR_FEELS_LIKE));
 
+
         //Hourly Weather
         //data structure >>>> hourly.data[x].time
         JSONObject hourly = forecast.getJSONObject(WeatherConstants.KEY_HOURLY_WEATHER);
@@ -211,16 +210,27 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
         JSONArray jsonHourlyData = hourly.getJSONArray(WeatherConstants.KEY_DATA);
         Log.d(TAG, "Hourly JSON Data: " + jsonHourlyData);
         for (int i=0; i < jsonHourlyData.length(); i++) {
-            JSONObject hourlyTemp = jsonHourlyData.getJSONObject(i);
-            Log.d(TAG, "hourly array items: " + hourlyTemp + "/n");
-            
+            JSONObject hourlyData = jsonHourlyData.getJSONObject(i);
+
+//            currentWeather.setTemperature(hourlyData.getDouble(WeatherConstants.KEY_ATTR_TEMPERATURE));
+//            Double hourlyTemp = hourlyData.getDouble(WeatherConstants.KEY_ATTR_TEMPERATURE);
+//            Log.d(TAG, "" + hourlyTemp);
+
+//            String houlyIcon = hourlyData.getString(WeatherConstants.KEY_ATTR_ICON);
+//            Log.d(TAG, "icon: " + houlyIcon);
+        }
+
+        
+        //Daily Weather
+        JSONObject daily = forecast.getJSONObject(WeatherConstants.KEY_DAILY_WEATHER);
+
+        JSONArray jsonDailyData = daily.getJSONArray(WeatherConstants.KEY_DATA);
+        for (int i=0; i < jsonDailyData.length(); i++) {
+            JSONObject dailyData = jsonDailyData.getJSONObject(i);
+
 
         }
 
-//        currentWeather.setTemperature(hourly.getDouble(WeatherConstants.KEY_ATTR_TEMPERATURE));
-//        currentWeather.setIcon(hourly.getString(WeatherConstants.KEY_ATTR_ICON));
-
-        //Daily Weather
 //        currentWeather.setTempMax(daily.getDouble(WeatherConstants.KEY_ATTR_TEMP_MAX));
 //        currentWeather.setTempMin(daily.getDouble(WeatherConstants.KEY_ATTR_TEMP_MIN));
 //        currentWeather.setIcon(daily.getString(WeatherConstants.KEY_ATTR_ICON));
