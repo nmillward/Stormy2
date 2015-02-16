@@ -15,42 +15,43 @@
         android:layout_height="wrap_content"
         android:text="--"
         android:id="@+id/temperatureLabel"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
         android:textColor="@android:color/white"
-        android:textSize="150sp" />
+        android:textSize="50sp"
+        android:layout_below="@+id/tv_timeLabel"
+        android:layout_centerHorizontal="true" />
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/iv_degree"
-        android:layout_alignTop="@+id/temperatureLabel"
-        android:layout_toRightOf="@+id/temperatureLabel"
-        android:layout_toEndOf="@+id/temperatureLabel"
         android:paddingTop="50dp"
         android:src="@drawable/degree"
-        android:nestedScrollingEnabled="true" />
+        android:nestedScrollingEnabled="true"
+        android:layout_below="@+id/tv_locationLabel"
+        android:layout_toRightOf="@+id/temperatureLabel"
+        android:layout_toEndOf="@+id/temperatureLabel" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/tv_timeLabel"
-        android:layout_above="@+id/temperatureLabel"
-        android:layout_centerHorizontal="true"
         android:text="At ... PM it will be"
         android:textColor="#80ffffff"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:layout_below="@+id/tv_locationLabel"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Alcatraz Island, CA"
         android:id="@+id/tv_locationLabel"
-        android:layout_above="@+id/tv_timeLabel"
-        android:layout_centerHorizontal="true"
         android:textColor="@android:color/white"
         android:textSize="24sp"
-        android:layout_marginBottom="60dp" />
+        android:layout_below="@+id/iv_refresh"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="38dp" />
 
     <ImageView
         android:layout_width="wrap_content"
@@ -148,4 +149,11 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_alignBottom="@+id/iv_refresh" />
+
+    <ListView
+        android:id="@+id/lv_daily"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_summaryLabel"
+        android:gravity="center_horizontal" />
 </RelativeLayout>

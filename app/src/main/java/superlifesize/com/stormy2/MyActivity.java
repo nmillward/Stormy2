@@ -11,7 +11,10 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +30,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -39,7 +43,12 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
     public static final String TAG = MyActivity.class.getSimpleName();
 
     private CurrentWeather mCurrentWeather;
+//    private DailyWeather mDailyWeather;
+//    private HourlyWeather mHourlyWeather;
     private LocationProvider mLocationProvider;
+
+    private List<DailyWeather> dailyWeatherList = new ArrayList<DailyWeather>();
+    static ArrayList<String> resultDailyRow;
 
     private double latitude = 0.0;
     private double longitude = 0.0;
@@ -179,6 +188,7 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
 
 
         //Update Daily Weather
+        populateDailyListView();
 
     }
 
@@ -189,8 +199,12 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
 
         //Weather Objects
         JSONObject currently = forecast.getJSONObject(WeatherConstants.KEY_CURRENT_WEATHER);
+        JSONObject hourly = forecast.getJSONObject(WeatherConstants.KEY_HOURLY_WEATHER);
+        JSONObject daily = forecast.getJSONObject(WeatherConstants.KEY_DAILY_WEATHER);
 
         CurrentWeather currentWeather = new CurrentWeather();
+        HourlyWeather hourlyWeather = new HourlyWeather();
+        DailyWeather dailyWeather = new DailyWeather();
 
         //Current Weather
         currentWeather.setHumidity(currently.getDouble(WeatherConstants.KEY_ATTR_HUMIDITY));
@@ -204,42 +218,101 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
 
 
         //Hourly Weather
-        //data structure >>>> hourly.data[x].time
-        JSONObject hourly = forecast.getJSONObject(WeatherConstants.KEY_HOURLY_WEATHER);
-
         JSONArray jsonHourlyData = hourly.getJSONArray(WeatherConstants.KEY_DATA);
         Log.d(TAG, "Hourly JSON Data: " + jsonHourlyData);
         for (int i=0; i < jsonHourlyData.length(); i++) {
             JSONObject hourlyData = jsonHourlyData.getJSONObject(i);
 
-//            currentWeather.setTemperature(hourlyData.getDouble(WeatherConstants.KEY_ATTR_TEMPERATURE));
-//            Double hourlyTemp = hourlyData.getDouble(WeatherConstants.KEY_ATTR_TEMPERATURE);
-//            Log.d(TAG, "" + hourlyTemp);
-
-//            String houlyIcon = hourlyData.getString(WeatherConstants.KEY_ATTR_ICON);
-//            Log.d(TAG, "icon: " + houlyIcon);
+            hourlyWeather.setTemperature(hourlyData.getDouble(WeatherConstants.KEY_ATTR_TEMPERATURE));
+            hourlyWeather.setIcon(hourlyData.getString(WeatherConstants.KEY_ATTR_ICON));
+            hourlyWeather.setTime(hourlyData.getLong(WeatherConstants.KEY_ATTR_TIME));
         }
 
-        
-        //Daily Weather
-        JSONObject daily = forecast.getJSONObject(WeatherConstants.KEY_DAILY_WEATHER);
 
+        //Daily Weather
         JSONArray jsonDailyData = daily.getJSONArray(WeatherConstants.KEY_DATA);
         for (int i=0; i < jsonDailyData.length(); i++) {
             JSONObject dailyData = jsonDailyData.getJSONObject(i);
 
+            //DailyWeather resultDailyRow = new DailyWeather();
 
+            dailyWeather.setTempMax(dailyData.getDouble(WeatherConstants.KEY_ATTR_TEMP_MAX));
+            Log.d(TAG, "Temp Max: " + dailyData.getDouble(WeatherConstants.KEY_ATTR_TEMP_MAX));
+            dailyWeather.setTempMin(dailyData.getDouble(WeatherConstants.KEY_ATTR_TEMP_MIN));
+            dailyWeather.setIcon(dailyData.getString(WeatherConstants.KEY_ATTR_ICON));
+            dailyWeather.setDayOfWeek(dailyData.getLong(WeatherConstants.KEY_ATTR_TIME));
+
+            dailyWeatherList.add(dailyWeather);
+//            resultDailyRow.add(dailyWeatherList);
+            Log.d(TAG, "Daily Weather List: " + dailyWeatherList);
+            Log.d(TAG, "Daily Weather Item: " + dailyWeather);
         }
-
-//        currentWeather.setTempMax(daily.getDouble(WeatherConstants.KEY_ATTR_TEMP_MAX));
-//        currentWeather.setTempMin(daily.getDouble(WeatherConstants.KEY_ATTR_TEMP_MIN));
-//        currentWeather.setIcon(daily.getString(WeatherConstants.KEY_ATTR_ICON));
 
 
         Log.d(TAG, currentWeather.getFormattedTime());
+        Log.d(TAG, dailyWeather.getFormattedDate());
+        Log.d(TAG, hourlyWeather.getFormattedTime());
 
         return currentWeather;
     }
+
+    //
+
+
+    private void populateDailyListView() {
+        ListView dailyListView = (ListView) findViewById(R.id.lv_daily);
+        ArrayAdapter<DailyWeather> dailyAdapter = new DailyListAdapter();
+        dailyListView.setAdapter(dailyAdapter);
+    }
+
+    private class DailyListAdapter extends ArrayAdapter<DailyWeather>{
+        public DailyListAdapter() {
+            super (MyActivity.this, R.layout.lv_item_view, dailyWeatherList);
+        }
+
+    private class DailyViewHolder {
+            TextView tv_day;
+            ImageView iv_icon;
+            TextView tv_tempHigh;
+            TextView tv_tempLow;
+
+            DailyViewHolder(View view) {
+                tv_day = (TextView) view.findViewById(R.id.tv_day_of_week);
+                iv_icon = (ImageView) view.findViewById(R.id.iv_icon);
+                tv_tempHigh = (TextView) view.findViewById(R.id.tv_temp_high);
+                tv_tempLow = (TextView) view.findViewById(R.id.tv_temp_low);
+            }
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            //Make sure we have a view to work with
+            View itemView = convertView;
+            DailyViewHolder holder = null;
+            if (itemView == null) {
+                itemView = getLayoutInflater().inflate(R.layout.lv_item_view, parent, false);
+                holder = new DailyViewHolder(itemView);
+                itemView.setTag(holder);
+                Log.d(TAG, "Creating a new row.");
+            } else {
+                holder = (DailyViewHolder) itemView.getTag();
+                Log.d(TAG, "Recycling the row");
+            }
+
+            //Find the day of the week to work with
+            DailyWeather currentDay = dailyWeatherList.get(position);
+            Log.d(TAG, "Current Day: " + currentDay);
+
+            holder.tv_day.setText(currentDay.getFormattedDate());
+            Log.d(TAG, "Day: " + holder.tv_day);
+            holder.iv_icon.setImageResource(currentDay.getIconId());
+            holder.tv_tempHigh.setText("" + currentDay.getTempMax());
+            holder.tv_tempLow.setText("" + currentDay.getTempMin());
+
+            return itemView;
+        }
+    }
+
 
     private void getGeolocation() {
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());

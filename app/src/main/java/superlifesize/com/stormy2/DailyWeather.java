@@ -13,6 +13,14 @@ public class DailyWeather {
     private double mTempMin;
     private double mTempMax;
 
+//    public DailyWeather(String mIcon, long mDayOfWeek, double mTempMax, double mTempMin) {
+//        super();
+//        this.mIcon = mIcon;
+//        this.mDayOfWeek = mDayOfWeek;
+//        this.mTempMax = mTempMax;
+//        this.mTempMin = mTempMin;
+//    }
+
 
     public void setIcon(String icon) {
         mIcon = icon;
