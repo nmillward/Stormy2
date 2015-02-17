@@ -67,7 +67,7 @@ public class HourlyWeather {
     }
 
     public String getFormattedTime() {
-        SimpleDateFormat formatter = new SimpleDateFormat("h a");
+        SimpleDateFormat formatter = new SimpleDateFormat("ha");
         Date dateTime = new Date(getTime() * 1000);
         String timeString = formatter.format(dateTime);
         return timeString;

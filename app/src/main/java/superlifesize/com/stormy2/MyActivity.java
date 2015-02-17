@@ -36,6 +36,7 @@ import java.util.Locale;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import it.sephiroth.android.library.widget.HListView;
 
 
 public class MyActivity extends Activity implements LocationProvider.LocationCallback {
@@ -43,12 +44,10 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
     public static final String TAG = MyActivity.class.getSimpleName();
 
     private CurrentWeather mCurrentWeather;
-//    private DailyWeather mDailyWeather;
-//    private HourlyWeather mHourlyWeather;
     private LocationProvider mLocationProvider;
 
     private List<DailyWeather> dailyWeatherList = new ArrayList<DailyWeather>();
-    static ArrayList<String> resultDailyRow;
+    private List<HourlyWeather> hourlyWeatherList = new ArrayList<HourlyWeather>();
 
     private double latitude = 0.0;
     private double longitude = 0.0;
@@ -185,7 +184,7 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
         mIconLocation.setImageDrawable(drawable);
 
         //Update Hourly Weather
-
+        populateHourlyListView();
 
         //Update Daily Weather
         populateDailyListView();
@@ -221,31 +220,39 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
         JSONArray jsonHourlyData = hourly.getJSONArray(WeatherConstants.KEY_DATA);
         Log.d(TAG, "Hourly JSON Data: " + jsonHourlyData);
         for (int i=0; i < jsonHourlyData.length(); i++) {
+//        for (int i=0; i < 5; i++) {
+
             JSONObject hourlyData = jsonHourlyData.getJSONObject(i);
 
-            hourlyWeather.setTemperature(hourlyData.getDouble(WeatherConstants.KEY_ATTR_TEMPERATURE));
-            hourlyWeather.setIcon(hourlyData.getString(WeatherConstants.KEY_ATTR_ICON));
-            hourlyWeather.setTime(hourlyData.getLong(WeatherConstants.KEY_ATTR_TIME));
+            HourlyWeather resultHourlyRow = new HourlyWeather();
+
+            resultHourlyRow.setTemperature(hourlyData.getDouble(WeatherConstants.KEY_ATTR_TEMPERATURE));
+            resultHourlyRow.setIcon(hourlyData.getString(WeatherConstants.KEY_ATTR_ICON));
+            resultHourlyRow.setTime(hourlyData.getLong(WeatherConstants.KEY_ATTR_TIME));
+
+            hourlyWeatherList.add(resultHourlyRow);
+            Log.d(TAG, "Hourly Weather List: " + hourlyWeatherList);
         }
 
 
         //Daily Weather
         JSONArray jsonDailyData = daily.getJSONArray(WeatherConstants.KEY_DATA);
-        for (int i=0; i < jsonDailyData.length(); i++) {
+//        for (int i=0; i < jsonDailyData.length(); i++) {
+        for (int i=0; i < 1; i++) {
+
             JSONObject dailyData = jsonDailyData.getJSONObject(i);
 
-            //DailyWeather resultDailyRow = new DailyWeather();
+            DailyWeather resultDailyRow = new DailyWeather();
 
-            dailyWeather.setTempMax(dailyData.getDouble(WeatherConstants.KEY_ATTR_TEMP_MAX));
-            Log.d(TAG, "Temp Max: " + dailyData.getDouble(WeatherConstants.KEY_ATTR_TEMP_MAX));
-            dailyWeather.setTempMin(dailyData.getDouble(WeatherConstants.KEY_ATTR_TEMP_MIN));
-            dailyWeather.setIcon(dailyData.getString(WeatherConstants.KEY_ATTR_ICON));
-            dailyWeather.setDayOfWeek(dailyData.getLong(WeatherConstants.KEY_ATTR_TIME));
+            resultDailyRow.setTempMax(dailyData.getDouble(WeatherConstants.KEY_ATTR_TEMP_MAX));
+            resultDailyRow.setTempMin(dailyData.getDouble(WeatherConstants.KEY_ATTR_TEMP_MIN));
+            resultDailyRow.setIcon(dailyData.getString(WeatherConstants.KEY_ATTR_ICON));
+            resultDailyRow.setDayOfWeek(dailyData.getLong(WeatherConstants.KEY_ATTR_TIME));
+            Log.d(TAG, "TIME: " + dailyData.getLong(WeatherConstants.KEY_ATTR_TIME));
 
-            dailyWeatherList.add(dailyWeather);
-//            resultDailyRow.add(dailyWeatherList);
-            Log.d(TAG, "Daily Weather List: " + dailyWeatherList);
-            Log.d(TAG, "Daily Weather Item: " + dailyWeather);
+            dailyWeatherList.add(resultDailyRow);
+//            Log.d(TAG, "Daily Weather List: " + dailyWeatherList);
+//            Log.d(TAG, "Daily Weather Item: " + dailyWeather);
         }
 
 
@@ -256,9 +263,9 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
         return currentWeather;
     }
 
-    //
-
-
+    //====================================
+    //ArrayAdapter for Daily JSON Data
+    //====================================
     private void populateDailyListView() {
         ListView dailyListView = (ListView) findViewById(R.id.lv_daily);
         ArrayAdapter<DailyWeather> dailyAdapter = new DailyListAdapter();
@@ -270,7 +277,8 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
             super (MyActivity.this, R.layout.lv_item_view, dailyWeatherList);
         }
 
-    private class DailyViewHolder {
+        //ViewHolder for Daily JSON Data
+        private class DailyViewHolder {
             TextView tv_day;
             ImageView iv_icon;
             TextView tv_tempHigh;
@@ -284,6 +292,7 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
             }
         }
 
+        //GetView to plug in Daily JSON Data to ListView Item
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             //Make sure we have a view to work with
@@ -293,22 +302,70 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
                 itemView = getLayoutInflater().inflate(R.layout.lv_item_view, parent, false);
                 holder = new DailyViewHolder(itemView);
                 itemView.setTag(holder);
-                Log.d(TAG, "Creating a new row.");
             } else {
                 holder = (DailyViewHolder) itemView.getTag();
-                Log.d(TAG, "Recycling the row");
             }
 
             //Find the day of the week to work with
             DailyWeather currentDay = dailyWeatherList.get(position);
-            Log.d(TAG, "Current Day: " + currentDay);
+//            Log.d(TAG, "Current Day: " + currentDay);
 
             holder.tv_day.setText(currentDay.getFormattedDate());
-            Log.d(TAG, "Day: " + holder.tv_day);
             holder.iv_icon.setImageResource(currentDay.getIconId());
             holder.tv_tempHigh.setText("" + currentDay.getTempMax());
             holder.tv_tempLow.setText("" + currentDay.getTempMin());
 
+            return itemView;
+        }
+    }
+
+
+    //====================================
+    //ArrayAdapter for Hourly JSON Data
+    //====================================
+    private void populateHourlyListView() {
+        HListView hourlyListView = (HListView) findViewById(R.id.HlistView);
+//        ListView hourlyListView = (ListView) findViewById(R.id.HlistView);
+        ArrayAdapter<HourlyWeather> hourlyAdapter = new HourlyListAdapter();
+        hourlyListView.setAdapter(hourlyAdapter);
+    }
+
+    private class HourlyListAdapter extends ArrayAdapter<HourlyWeather> {
+        public HourlyListAdapter() {
+            super (MyActivity.this, R.layout.h_lv_item_view, hourlyWeatherList);
+        }
+
+        private class HourlyViewHolder {
+            TextView tv_hour;
+            ImageView iv_icon;
+            TextView tv_temp;
+
+            HourlyViewHolder(View view) {
+                tv_hour = (TextView) view.findViewById(R.id.tv_hour_time);
+                iv_icon = (ImageView) view.findViewById(R.id.iv_hour_icon);
+                tv_temp = (TextView) view.findViewById(R.id.tv_hour_temp);
+            }
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View itemView = convertView;
+            HourlyViewHolder holder = null;
+            if (itemView == null) {
+                itemView = getLayoutInflater().inflate(R.layout.h_lv_item_view, parent, false);
+                holder = new HourlyViewHolder(itemView);
+                itemView.setTag(holder);
+            } else {
+                holder = (HourlyViewHolder) itemView.getTag();
+            }
+
+            HourlyWeather currentHour = hourlyWeatherList.get(position);
+
+            holder.tv_hour.setText(currentHour.getFormattedTime());
+            holder.iv_icon.setImageResource(currentHour.getIconId());
+            holder.tv_temp.setText("" + currentHour.getTemperature());
+
+            Log.d(TAG, "itemView: " + itemView);
             return itemView;
         }
     }
