@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:id="@+id/lv_item_view"
     android:padding="10dp">
 
@@ -19,8 +20,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
+        android:gravity="center"
         android:text="Monday"
-        android:layout_alignBottom="@+id/iv_icon"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 

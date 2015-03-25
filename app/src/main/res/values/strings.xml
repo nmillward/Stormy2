@@ -9,7 +9,8 @@
     <string name="OK">Ok</string>
     <string name="network_unavailable">Network is unavailable!</string>
 
-    <string name="google_maps_key">AIzaSyAIRtyebweI483eB_9AMiLO6Wf69t9ek40</string>
+    <string name="google_maps_key">AIzaSyCaSIxEBAmokkMP-dUPZtiB7FGKq2OIEEE</string>
+    <!--<string name="google_maps_key">AIzaSyBrJI1InIxl-nyMwtFFZsmyfxTCv4TrVSA</string>-->
 
     <string name="forecast_api_key">78a898a4e77432239aa213d337238bed</string>
 

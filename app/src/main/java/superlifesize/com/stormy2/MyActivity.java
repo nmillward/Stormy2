@@ -12,13 +12,17 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.melnykov.fab.FloatingActionButton;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
@@ -43,7 +47,12 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
 
     public static final String TAG = MyActivity.class.getSimpleName();
 
+    private WebView webView;
+    @InjectView(R.id.ll_gif) LinearLayout ll_gif;
+
     private CurrentWeather mCurrentWeather;
+    private HourlyWeather mHourlyWeather;
+    private DailyWeather mDailyWeather;
     private LocationProvider mLocationProvider;
 
     private List<DailyWeather> dailyWeatherList = new ArrayList<DailyWeather>();
@@ -64,6 +73,11 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
     @InjectView(R.id.progressBar) ProgressBar mProgressBar;
     @InjectView(R.id.tv_locationLabel) TextView mLocationTitle;
 
+    @InjectView(R.id.fab) FloatingActionButton fab;
+    @InjectView(R.id.scrollView) ScrollView scrollView;
+
+//    @InjectView(R.id.wv_gif) WebView webView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +94,20 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
                 getForecast(latitude, longitude);
             }
         });
+
+        try {
+            GifWebView gif = new GifWebView(this, "http://media4.giphy.com/media/DFiwMapItOTh6/200.gif");
+            ll_gif.addView(gif);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//        fab.attachToScrollView(scrollView);
+
+//        GifWebView view = new GifWebView(this, "/Users/nmilward/AndroidStudioProjects/Stormy2/app/src/main/res/assets/cat_gif.gif");
+
+//        String gifURL = "<!DOCTYPE html><html><body><img src=\"media4.giphy.com/media/DFiwMapItOTh6/200.gif\"; width=\"200\" height=\"200\"></body></html>";
+//        webView.loadData(gifURL, "text/html", "utf-8");
 
         Log.d(TAG, "Running on the Main Thread");
     }
@@ -138,6 +166,8 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
                         Log.v(TAG, jsonData);
                         if (response.isSuccessful()) {
                             mCurrentWeather = getCurrentDetails(jsonData);
+                            //mHourlyWeather = getHourlyDetails(jsonData);
+                            //mDailyWeather = getDailyDetails(jsonData);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -191,19 +221,68 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
 
     }
 
+//    private HourlyWeather getHourlyDetails (String jsonData) throws JSONException {
+//        JSONObject forecast = new JSONObject(jsonData);
+//        JSONObject hourly = forecast.getJSONObject(WeatherConstants.KEY_HOURLY_WEATHER);
+//
+//        HourlyWeather hourlyWeather = new HourlyWeather();
+//
+//        JSONArray jsonHourlyData = hourly.getJSONArray(WeatherConstants.KEY_DATA);
+//        Log.d(TAG, "Hourly JSON Data: " + jsonHourlyData);
+//        for (int i=0; i < jsonHourlyData.length(); i++) {
+//
+//            JSONObject hourlyData = jsonHourlyData.getJSONObject(i);
+//
+//            HourlyWeather resultHourlyRow = new HourlyWeather();
+//
+//            resultHourlyRow.setTemperature(hourlyData.getDouble(WeatherConstants.KEY_ATTR_TEMPERATURE));
+//            resultHourlyRow.setIcon(hourlyData.getString(WeatherConstants.KEY_ATTR_ICON));
+//            resultHourlyRow.setTime(hourlyData.getLong(WeatherConstants.KEY_ATTR_TIME));
+//
+//            hourlyWeatherList.add(resultHourlyRow);
+//        }
+//
+//        return hourlyWeather;
+//    }
+
+//    private DailyWeather getDailyDetails (String jsonData) throws JSONException {
+//        JSONObject forecast = new JSONObject(jsonData);
+//        JSONObject daily = forecast.getJSONObject(WeatherConstants.KEY_DAILY_WEATHER);
+//        DailyWeather dailyWeather = new DailyWeather();
+//
+//        //Daily Weather
+//        JSONArray jsonDailyData = daily.getJSONArray(WeatherConstants.KEY_DATA);
+//        for (int i=0; i < jsonDailyData.length(); i++) {
+//
+//            JSONObject dailyData = jsonDailyData.getJSONObject(i);
+//
+//            DailyWeather resultDailyRow = new DailyWeather();
+//
+//            resultDailyRow.setTempMax(dailyData.getDouble(WeatherConstants.KEY_ATTR_TEMP_MAX));
+//            resultDailyRow.setTempMin(dailyData.getDouble(WeatherConstants.KEY_ATTR_TEMP_MIN));
+//            resultDailyRow.setIcon(dailyData.getString(WeatherConstants.KEY_ATTR_ICON));
+//            resultDailyRow.setDayOfWeek(dailyData.getLong(WeatherConstants.KEY_ATTR_TIME));
+//            Log.d(TAG, "TIME: " + dailyData.getLong(WeatherConstants.KEY_ATTR_TIME));
+//
+//            dailyWeatherList.add(resultDailyRow);
+//        }
+//
+//        return dailyWeather;
+//    }
+
     private CurrentWeather getCurrentDetails(String jsonData) throws JSONException {
         JSONObject forecast = new JSONObject(jsonData);
         String timezone = forecast.getString(WeatherConstants.KEY_ATTR_TIMEZONE);
         Log.i(TAG, "From JSON: " + timezone);
 
-        //Weather Objects
         JSONObject currently = forecast.getJSONObject(WeatherConstants.KEY_CURRENT_WEATHER);
-        JSONObject hourly = forecast.getJSONObject(WeatherConstants.KEY_HOURLY_WEATHER);
         JSONObject daily = forecast.getJSONObject(WeatherConstants.KEY_DAILY_WEATHER);
+        JSONObject hourly = forecast.getJSONObject(WeatherConstants.KEY_HOURLY_WEATHER);
 
         CurrentWeather currentWeather = new CurrentWeather();
-        HourlyWeather hourlyWeather = new HourlyWeather();
         DailyWeather dailyWeather = new DailyWeather();
+        HourlyWeather hourlyWeather = new HourlyWeather();
+
 
         //Current Weather
         currentWeather.setHumidity(currently.getDouble(WeatherConstants.KEY_ATTR_HUMIDITY));
@@ -215,30 +294,9 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
         currentWeather.setTimeZone(timezone);
         currentWeather.setFeelsLike(currently.getDouble(WeatherConstants.KEY_ATTR_FEELS_LIKE));
 
-
-        //Hourly Weather
-        JSONArray jsonHourlyData = hourly.getJSONArray(WeatherConstants.KEY_DATA);
-        Log.d(TAG, "Hourly JSON Data: " + jsonHourlyData);
-        for (int i=0; i < jsonHourlyData.length(); i++) {
-//        for (int i=0; i < 5; i++) {
-
-            JSONObject hourlyData = jsonHourlyData.getJSONObject(i);
-
-            HourlyWeather resultHourlyRow = new HourlyWeather();
-
-            resultHourlyRow.setTemperature(hourlyData.getDouble(WeatherConstants.KEY_ATTR_TEMPERATURE));
-            resultHourlyRow.setIcon(hourlyData.getString(WeatherConstants.KEY_ATTR_ICON));
-            resultHourlyRow.setTime(hourlyData.getLong(WeatherConstants.KEY_ATTR_TIME));
-
-            hourlyWeatherList.add(resultHourlyRow);
-            Log.d(TAG, "Hourly Weather List: " + hourlyWeatherList);
-        }
-
-
         //Daily Weather
         JSONArray jsonDailyData = daily.getJSONArray(WeatherConstants.KEY_DATA);
-//        for (int i=0; i < jsonDailyData.length(); i++) {
-        for (int i=0; i < 1; i++) {
+        for (int i=0; i < jsonDailyData.length(); i++) {
 
             JSONObject dailyData = jsonDailyData.getJSONObject(i);
 
@@ -251,17 +309,26 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
             Log.d(TAG, "TIME: " + dailyData.getLong(WeatherConstants.KEY_ATTR_TIME));
 
             dailyWeatherList.add(resultDailyRow);
-//            Log.d(TAG, "Daily Weather List: " + dailyWeatherList);
-//            Log.d(TAG, "Daily Weather Item: " + dailyWeather);
         }
 
+        JSONArray jsonHourlyData = hourly.getJSONArray(WeatherConstants.KEY_DATA);
+        Log.d(TAG, "Hourly JSON Data: " + jsonHourlyData);
+        for (int i=0; i < jsonHourlyData.length(); i++) {
 
-        Log.d(TAG, currentWeather.getFormattedTime());
-        Log.d(TAG, dailyWeather.getFormattedDate());
-        Log.d(TAG, hourlyWeather.getFormattedTime());
+            JSONObject hourlyData = jsonHourlyData.getJSONObject(i);
+
+            HourlyWeather resultHourlyRow = new HourlyWeather();
+
+            resultHourlyRow.setTemperature(hourlyData.getDouble(WeatherConstants.KEY_ATTR_TEMPERATURE));
+            resultHourlyRow.setIcon(hourlyData.getString(WeatherConstants.KEY_ATTR_ICON));
+            resultHourlyRow.setTime(hourlyData.getLong(WeatherConstants.KEY_ATTR_TIME));
+
+            hourlyWeatherList.add(resultHourlyRow);
+        }
 
         return currentWeather;
     }
+
 
     //====================================
     //ArrayAdapter for Daily JSON Data
@@ -325,7 +392,6 @@ public class MyActivity extends Activity implements LocationProvider.LocationCal
     //====================================
     private void populateHourlyListView() {
         HListView hourlyListView = (HListView) findViewById(R.id.HlistView);
-//        ListView hourlyListView = (ListView) findViewById(R.id.HlistView);
         ArrayAdapter<HourlyWeather> hourlyAdapter = new HourlyListAdapter();
         hourlyListView.setAdapter(hourlyAdapter);
     }

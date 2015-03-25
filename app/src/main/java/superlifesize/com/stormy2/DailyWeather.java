@@ -73,7 +73,7 @@ public class DailyWeather {
     }
 
     public String getFormattedDate() {
-        SimpleDateFormat formatter = new SimpleDateFormat("EEEE");
+        SimpleDateFormat formatter = new SimpleDateFormat("cccc");
         Date day = new Date(getDayOfWeek());
         String dayOfTheWeek = formatter.format(day);
         return dayOfTheWeek;
